@@ -12,5 +12,5 @@ cd build
 cmake -DWITH_NTL=ON  -DNATIVE_SIZE=32 -DWITH_NATIVEOPT=ON -DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12 -DWITH_OPENMP=OFF -DCMAKE_C_FLAGS="-pthread" -DCMAKE_CXX_FLAGS="-pthread" ..
 make 
 ```
-2. Run the `boolean-xzwdf` or `boolean-xzwdf-lwe` program in `build/bin/examples/binfhe`
+2. Run the `boolean-ntru` or `boolean-lwe` program in `build/bin/examples/binfhe`
 
