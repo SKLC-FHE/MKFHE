@@ -2,8 +2,9 @@
 A proof of concept for NTRU based MKFHE
 =====================================
 ### Requirements
-OpenFHE v1.1.1
-A C++ compiler, the NTL libraries.
+OpenFHE v1.1.1, 
+
+A C++ compiler, the NTL, GMP libraries.
 
 ## Run the code
 1. Configure, build and compile the project.
