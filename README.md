@@ -2,6 +2,7 @@
 A proof of concept for NTRU based MKFHE
 =====================================
 ### Requirements
+OpenFHE v1.1.1
 A C++ compiler, the NTL libraries.
 
 ## Run the code
