@@ -5,7 +5,7 @@
 #include "math/binaryuniformgenerator.h"
 #include "math/discreteuniformgenerator.h"
 #include "math/ternaryuniformgenerator.h"
-// #define WITH_NOISE_DEBUG
+//#define WITH_NOISE_DEBUG
 using namespace std;
 namespace lbcrypto {
 
@@ -50,9 +50,9 @@ MKLWECiphertext MKLWEEncryptionScheme::Encrypt(const std::shared_ptr<MKLWECrypto
     for(uint32_t u = 0 ; u<k ;u++)
     {
         s[u].SwitchModulus(mod);
-        DiscreteUniformGeneratorImpl<NativeVector> dug;
-        dug.SetModulus(mod);
-        a[u] = dug.GenerateVector(n);
+
+      DiscreteGaussianGeneratorImpl<NativeVector> dgg;
+        a[u] = dgg.GenerateVector(n,mod);
         NativeInteger mu = mod.ComputeMu();
         for (size_t i = 0; i < n; ++i) {
             b += a[u][i].ModMulFast(s[u][i], mod, mu);
@@ -65,10 +65,7 @@ MKLWECiphertext MKLWEEncryptionScheme::Encrypt(const std::shared_ptr<MKLWECrypto
 
 void MKLWEEncryptionScheme::Decrypt(const std::shared_ptr<MKLWECryptoParams>& params, ConstMKLWEPrivateKey& sk,
                                   ConstMKLWECiphertext& ct, MKLWEPlaintext* result, MKLWEPlaintextModulus p) const {
-    // TODO in the future we should add a check to make sure sk parameters match
-    // the ct parameters
 
-    // Create local variables to speed up the computations
     const NativeInteger& mod = ct->GetModulus();
     if (mod % (p * 2) != 0 && mod.ConvertToInt() & (1 == 0)) {
         std::string errMsg = "ERROR: ciphertext modulus q needs to be divisible by plaintext modulus p*2.";
@@ -100,14 +97,9 @@ void MKLWEEncryptionScheme::Decrypt(const std::shared_ptr<MKLWECryptoParams>& pa
     *result = ((NativeInteger(p) * r) / mod).ConvertToInt();
 
 #if defined(WITH_NOISE_DEBUG)
-    // double error =
-    //     (static_cast<double>(p) * (r.ConvertToDouble() - mod.ConvertToDouble() / (p * 2))) / mod.ConvertToDouble() -
-    //     static_cast<double>(*result);
-    // std::cerr << error * mod.ConvertToDouble() / static_cast<double>(p) <<" ";
+    
     int q = ct->GetModulus().ConvertToInt();
-    // cout<<"q = "<<q<<endl;
-    // cout<<"q/8 = "<<q/8<<endl;
-    // cout<<"q/4 = "<<q/4<<endl;
+
     NativeInteger temp = r.ModSubFastEq((mod / (p * 2)), mod);
     NativeInteger ans =  typename NativeVector::Integer(1);
     temp.ModSubFastEq(NativeVector::Integer(ans * mod / 4), mod); 
@@ -208,8 +200,9 @@ MKLWESwitchingKey MKLWEEncryptionScheme::KeySwitchGen(const std::shared_ptr<MKLW
         sv.SwitchModulus(qKS);
         NativeVector svN = skN[u];
         svN.SwitchModulus(qKS);
-        DiscreteUniformGeneratorImpl<NativeVector> dug;
-        dug.SetModulus(qKS);
+        // DiscreteUniformGeneratorImpl<NativeVector> dug;
+        // dug.SetModulus(qKS);
+        auto dgg= params->GetDgg();
         NativeInteger mu(qKS.ComputeMu());
         for (size_t i = 0; i < N; ++i) {
             std::vector<std::vector<NativeVector>> vector1A;
@@ -223,7 +216,9 @@ MKLWESwitchingKey MKLWEEncryptionScheme::KeySwitchGen(const std::shared_ptr<MKLW
                 std::vector<NativeInteger> vector2B;
                 vector2B.reserve(digitCount);
                 for (size_t k = 0; k < digitCount; ++k) {//dks
-                    vector2A.emplace_back(dug.GenerateVector(n));
+                  //  vector2A.emplace_back(dug.GenerateVector(n));
+                    vector2A.emplace_back(dgg.GenerateVector(n,qKS));
+                  //  cout<<vector2A[k]<<endl;
                     NativeVector& a = vector2A.back();
                     NativeInteger b = (params->GetDggKS().GenerateInteger(qKS)).ModAdd(svN[i].ModMul(j * digitsKS[k], qKS), qKS);
     #if NATIVEINT == 32

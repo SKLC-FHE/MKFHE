@@ -78,7 +78,7 @@
 // #include "rgsw-acckey.h"
 // #include "rgsw-cryptoparameters.h"
 
-//wkx
+//
 #include "vntru-acckey.h"
 #include "vntru-cryptoparameters.h"
 

@@ -182,7 +182,7 @@ LWECiphertext LWEEncryptionScheme::EncryptN(const std::shared_ptr<LWECryptoParam
     }
 
     auto ct = std::make_shared<LWECiphertextImpl>(LWECiphertextImpl(a, b));
-    ct->SetptModulus(p);  //wkx: m_p = p
+    ct->SetptModulus(p);  //: m_p = p
     return ct;
 }
 
@@ -321,9 +321,10 @@ LWESwitchingKey LWEEncryptionScheme::KeySwitchGen(const std::shared_ptr<LWECrypt
     //        }
     //    }
 
-    DiscreteUniformGeneratorImpl<NativeVector> dug;
-    dug.SetModulus(qKS);
-
+   // DiscreteUniformGeneratorImpl<NativeVector> dug;
+    DiscreteGaussianGeneratorImpl<NativeVector> dgg;
+    //dug.SetModulus(qKS);
+    dgg.SetStd(1.4);
     NativeInteger mu(qKS.ComputeMu());
 
     std::vector<std::vector<std::vector<NativeVector>>> resultVecA(N);
@@ -346,7 +347,9 @@ LWESwitchingKey LWEEncryptionScheme::KeySwitchGen(const std::shared_ptr<LWECrypt
             std::vector<NativeInteger> vector2B;
             vector2B.reserve(digitCount);
             for (size_t k = 0; k < digitCount; ++k) {
-                vector2A.emplace_back(dug.GenerateVector(n));
+                //vector2A.emplace_back(dug.GenerateVector(n));
+                vector2A.emplace_back(dgg.GenerateVector(n,qKS));
+               
                 NativeVector& a = vector2A.back();
                 NativeInteger b =
                     (params->GetDggKS().GenerateInteger(qKS)).ModAdd(svN[i].ModMul(j * digitsKS[k], qKS), qKS);

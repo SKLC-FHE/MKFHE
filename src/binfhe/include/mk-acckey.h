@@ -2,20 +2,21 @@
 #define _MK_BTKEY_H_
 
 
-//wkx
+//
 #include "mntru-ciphertext.h"
 #include "mntru-keyswitchkey.h"
+#include "mntru-keyswitchkey2.h"
 #include "mntru-privatekey.h"
 #include "mntru-cryptoparameters.h"
 
-//wkx
+//
 #include "mklwe-ciphertext.h"
 #include "mklwe-keyswitchkey.h"
 #include "mklwe-privatekey.h"
 #include "mklwe-cryptoparameters.h"
 
 
-//wkx
+//
 #include "mk-evalkey.h"
 
 #include "lattice/lat-hal.h"

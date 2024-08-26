@@ -26,7 +26,7 @@ using ConstMNTRUCiphertext = const std::shared_ptr<const MNTRUCiphertextImpl>;
 
 class MNTRUCiphertextImpl : public Serializable {
 private:
-    std::vector<NativeVector> m_elements{};  //k个 n维向量
+    std::vector<NativeVector> m_elements{};  
     NativeInteger m_p = 4;  // pt modulus
     
 public:

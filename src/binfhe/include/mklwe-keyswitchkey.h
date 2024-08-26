@@ -25,7 +25,7 @@ using ConstMKLWESwitchingKey = const std::shared_ptr<const MKLWESwitchingKeyImpl
  */
 class MKLWESwitchingKeyImpl : public Serializable {
 private:
-    std::vector<std::vector<std::vector<std::vector<NativeVector>>>> m_keyA;  //k N d_ks n个Vector
+    std::vector<std::vector<std::vector<std::vector<NativeVector>>>> m_keyA;  
     std::vector<std::vector<std::vector<std::vector<NativeInteger>>>> m_keyB;
 public:
     MKLWESwitchingKeyImpl() = default;

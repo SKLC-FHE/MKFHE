@@ -1,74 +1,4 @@
-//==================================================================================
-// BSD 2-Clause License
-//
-// Copyright (c) 2014-2022, NJIT, Duality Technologies Inc. and other contributors
-//
-// All rights reserved.
-//
-// Author TPOC: contact@openfhe.org
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//==================================================================================
 
-/*
- * Custom Modifications:
- * - [This code is the implementation of the algorithm in the paper https://eprint.iacr.org/2023/1564]
- * 
- * This modified section follows the terms of the original BSD 2-Clause License.
- * Other modifications are provided under the terms of the BSD 2-Clause License.
- * See the BSD 2-Clause License text below:
- */
-
-
-//==================================================================================
-// Additional BSD License for Custom Modifications:
-//
-// Copyright (c) 2023 Binwu Xiang,Kaixing Wang and other contributors
-//
-// All rights reserved.
-//
-// Author TPOC: wangkaixing22@mails.ucas.ac.cn
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//==================================================================================
 #ifndef _BINFHE_BASE_PARAMS_H_
 #define _BINFHE_BASE_PARAMS_H_
 
@@ -86,11 +16,13 @@
 #include "rgsw-cryptoparameters.h"
 #include "vntru-cryptoparameters.h"
 #include "mk-cryptoparameters.h"
-//wkx
+
 #include "mntru-ciphertext.h"
 #include "mntru-keyswitchkey.h"
+#include "mntru-keyswitchkey2.h"
+
 #include "mntru-cryptoparameters.h"
-//wkx mklwe
+
 #include "mklwe-ciphertext.h"
 #include "mklwe-keyswitchkey.h"
 #include "mklwe-cryptoparameters.h"
@@ -117,7 +49,7 @@ private:
     // shared pointer to an instance of RGSWCryptoParams
     std::shared_ptr<RingGSWCryptoParams> m_RGSWParams{nullptr};
 
-    // wkx
+ 
     // shared pointer to an instance of VNTRUCryptoParams
     std::shared_ptr<VectorNTRUCryptoParams> m_VNTRUParams{nullptr};
 
@@ -141,13 +73,13 @@ public:
    * @param lweparams a shared poiter to an instance of LWECryptoParams
    * @param rgswparams a shared poiter to an instance of RingGSWCryptoParams
    */
-    //带参数的构造函数，参数为智能指针
+
     BinFHECryptoParams(const std::shared_ptr<LWECryptoParams>& lweparams,
                        const std::shared_ptr<RingGSWCryptoParams>& rgswparams)
         : m_LWEParams(lweparams), m_RGSWParams(rgswparams) {}
 
 
-    //wkx
+ 
     BinFHECryptoParams(const std::shared_ptr<LWECryptoParams>& lweparams,
                     const std::shared_ptr<VectorNTRUCryptoParams>& vntruparams)
         : m_LWEParams(lweparams), m_VNTRUParams(vntruparams) {}
@@ -157,8 +89,7 @@ public:
     BinFHECryptoParams(const std::shared_ptr<MNTRUCryptoParams>& mntruparams,
                     const std::shared_ptr<UniEncCryptoParams>& uniencparams)
         : m_MNTRUParams(mntruparams), m_UniEncParams(uniencparams) {}
-    
-    //wkx mklwe
+
     BinFHECryptoParams(const std::shared_ptr<MKLWECryptoParams>& mklweparams,
                     const std::shared_ptr<UniEncCryptoParams>& uniencparams)
         : m_MKLWEParams(mklweparams), m_UniEncParams(uniencparams) {}
@@ -186,7 +117,7 @@ public:
     }
 
     /**
-   * wkx 
+
    * Getter for VectorNTRU params
    * @return
    */
@@ -195,7 +126,6 @@ public:
     }
 
     /**
-   * wkx 
    * Getter for MatrixNTRU params
    * @return
    */
@@ -204,7 +134,6 @@ public:
     }
 
     /**
-   * wkx 
    * Getter for MatrixNTRU params
    * @return
    */
@@ -214,7 +143,6 @@ public:
 
     /**
    * Compare two BinFHE sets of parameters
-   * wkx
    * @return
    */
     bool operator==(const BinFHECryptoParams& other) const {
@@ -227,17 +155,16 @@ public:
 
     /**
      * @brief 
-     * 使用了 Cereal 库进行序列化。序列化是将对象或数据结构转换为一种易于存储或传输的格式，以便稍后进行重建。
      * @tparam Archive 
      * @param ar 
      * @param version 
      */
     template <class Archive>
     void save(Archive& ar, std::uint32_t const version) const {
-        //使用 Cereal 序列化了成员变量 m_LWEParams
+       
         ar(::cereal::make_nvp("lweparams", m_LWEParams));
         ar(::cereal::make_nvp("rgswparams", m_RGSWParams));
-        //wkx
+      
         ar(::cereal::make_nvp("vntruparams", m_VNTRUParams));
         ar(::cereal::make_nvp("mntruparams", m_MNTRUParams));
         ar(::cereal::make_nvp("uniencparams", m_UniEncParams));
@@ -251,7 +178,7 @@ public:
         }
         ar(::cereal::make_nvp("lweparams", m_LWEParams));
         ar(::cereal::make_nvp("rgswparams", m_RGSWParams));
-        //wkx
+    
         ar(::cereal::make_nvp("vntruparams", m_VNTRUParams));
         ar(::cereal::make_nvp("mntruparams", m_MNTRUParams));
         ar(::cereal::make_nvp("uniencparams", m_UniEncParams));

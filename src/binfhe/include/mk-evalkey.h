@@ -4,6 +4,7 @@
 
 #include "mntru-ciphertext.h"
 #include "mntru-keyswitchkey.h"
+#include "mntru-keyswitchkey2.h"
 #include "mntru-privatekey.h"
 #include "mntru-cryptoparameters.h"
 
@@ -31,7 +32,7 @@ using ConstUniEncEvalKey = const std::shared_ptr<const UniEncEvalKeyImpl>;
  */
 class UniEncEvalKeyImpl : public Serializable {
 private:
-    std::vector<std::vector<NativePoly>> m_elements;//  d维度  d or F    多项式
+    std::vector<std::vector<NativePoly>> m_elements;//  
 public:
     UniEncEvalKeyImpl() = default;
 

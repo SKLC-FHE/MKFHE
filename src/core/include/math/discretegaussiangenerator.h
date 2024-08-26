@@ -91,7 +91,7 @@ public:
    * @param modulus The modulus to use to generate discrete values.
    * @param std     The standard deviation for this Gaussian Distribution.
    */
-    explicit DiscreteGaussianGeneratorImpl(double std = 1);
+    explicit DiscreteGaussianGeneratorImpl(double std = 2);
 
     /**
    * @brief Destructor

@@ -22,7 +22,7 @@ using ConstMNTRUPrivateKey = const std::shared_ptr<const MNTRUPrivateKeyImpl>;
  */
 class MNTRUPrivateKeyImpl : public Serializable {
 private:
-    std::vector<std::vector<NativeVector>> m_F{};// k个矩阵
+    std::vector<std::vector<NativeVector>> m_F{};//
     std::vector<std::vector<NativeVector>> m_F_inv{};
     uint32_t m_k;
 

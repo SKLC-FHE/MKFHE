@@ -1,77 +1,3 @@
-//==================================================================================
-// BSD 2-Clause License
-//
-// Copyright (c) 2014-2022, NJIT, Duality Technologies Inc. and other contributors
-//
-// All rights reserved.
-//
-// Author TPOC: contact@openfhe.org
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//==================================================================================
-
-/*
- * Custom Modifications:
- * - [This code is the implementation of the algorithm in the paper https://eprint.iacr.org/2023/1564]
- * 
- * This modified section follows the terms of the original BSD 2-Clause License.
- * Other modifications are provided under the terms of the BSD 2-Clause License.
- * See the BSD 2-Clause License text below:
- */
-
-
-//==================================================================================
-// Additional BSD License for Custom Modifications:
-//
-// Copyright (c) 2023 Binwu Xiang,Kaixing Wang and other contributors
-//
-// All rights reserved.
-//
-// Author TPOC: wangkaixing22@mails.ucas.ac.cn
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//==================================================================================
-/*
-  Header file for BinFHEContext class, which is used for Boolean circuit FHE schemes
- */
 
 #ifndef BINFHE_BINFHECONTEXT_H
 #define BINFHE_BINFHECONTEXT_H
@@ -124,7 +50,7 @@ struct BinFHEContextParams {
  */
 class BinFHEContext : public Serializable {
 
-//调整到前面了
+
 private:
     // Shared pointer to Ring GSW + LWE parameters
     std::shared_ptr<BinFHECryptoParams> m_params{nullptr};
@@ -132,11 +58,10 @@ private:
     // Shared pointer to the underlying additive LWE scheme
     std::shared_ptr<LWEEncryptionScheme> m_LWEscheme{nullptr};
 
-    //wkx
+  
     // Shared pointer to the underlying additive MNTRU scheme
     std::shared_ptr<MNTRUEncryptionScheme> m_MNTRUscheme{nullptr};
 
-    //wkx
     std::shared_ptr<MKLWEEncryptionScheme> m_MKLWEscheme{nullptr};
 
     // Shared pointer to the underlying RingGSW/RLWE scheme
@@ -150,10 +75,10 @@ private:
     // Whether to optimize time for sign eval
     bool m_timeOptimization{false};
 
-    //wkx
+   
     VectorNTRUBTKey m_NBTKey = {0};
 
-    //wkx
+
     std::map<uint32_t, VectorNTRUBTKey> m_NBTKey_map;
 
     //mk fhe
@@ -163,14 +88,14 @@ private:
     MNTRUCiphertext m_ctNAND;
 
 public:
-    //使用默认生成的构造函数。  
+  
     BinFHEContext() = default;
 
     void GenerateBinFHEContext(uint32_t n, uint32_t N, const NativeInteger& q, const NativeInteger& Q, double std,
                                uint32_t baseKS, uint32_t baseG, uint32_t baseR, SecretKeyDist keyDist = UNIFORM_TERNARY,
                                BINFHE_METHOD method = GINX, uint32_t numAutoKeys = 10);
 
-    void GenerateBinFHEContext(BINFHE_PARAMSET set,//枚举变量
+    void GenerateBinFHEContext(BINFHE_PARAMSET set,
      bool arbFunc, uint32_t logQ = 11, int64_t N = 0,
                                BINFHE_METHOD method = GINX, bool timeOptimization = false);
 
@@ -178,7 +103,6 @@ public:
     /**
    * Creates a crypto context using predefined parameters sets. Recommended for
    * most users.
-   * 使用预定义的参数集创建加密上下文。推荐给大多数用户。
    * @param set the parameter set: TOY, MEDIUM, STD128, STD192, STD256 with variants, see binfhe_constants.h
    * @param method the bootstrapping method (DM or CGGI or LMKCDEY)
    * @return create the cryptocontext
@@ -187,7 +111,6 @@ public:
 
     /**
    * Creates a crypto context using custom parameters.
-   * 使用自定义参数创建加密上下文。
    * @param params the parameter context
    * @param method the bootstrapping method (DM or CGGI or LMKCDEY)
    * @return create the cryptocontext
@@ -204,7 +127,7 @@ public:
     }
     const VectorNTRUACCKey& GetNRefreshKey() const {
         return m_NBTKey.BSkey;
-    }//wkx
+    }
 
     /**
    * Gets the switching key (used for serialization).
@@ -216,7 +139,7 @@ public:
     }
     const LWESwitchingKey& GetNSwitchKey() const {
         return m_NBTKey.KSkey;
-    }//wkx
+    }
 
     /**
    * Gets the public key (used for serialization).
@@ -228,21 +151,19 @@ public:
     }
     const LWEPublicKey& GetNPublicKey() const {
         return m_NBTKey.Pkey;
-    }//wkx
+    }
 
     /**
     * Gets the bootstrapping key map (used for serialization).
     *
     * @return a shared pointer to the bootstrapping key map
-    * 它返回一个shared_ptr（共享指针），该指针指向一个映射（map），映射的键类型是 uint32_t，值类型是 RingGSWBTKey。
     */
     const std::shared_ptr<std::map<uint32_t, RingGSWBTKey>> GetBTKeyMap() const {
         return std::make_shared<std::map<uint32_t, RingGSWBTKey>>(m_BTKey_map);
     }
     const std::shared_ptr<std::map<uint32_t, VectorNTRUBTKey>> GetNBTKeyMap() const {
         return std::make_shared<std::map<uint32_t, VectorNTRUBTKey>>(m_NBTKey_map);
-    }//wkx
-
+    }
     /**
    * Generates a secret key for the main LWE scheme
    *
@@ -264,7 +185,7 @@ public:
    */
     LWEPublicKey PubKeyGen(ConstLWEPrivateKey& sk) const;
 
-//wkx
+
     /**
    * Generates a secret key used in bootstrapping
    * @return a shared pointer to the secret key
@@ -330,7 +251,7 @@ public:
    */
     void Decrypt(ConstLWEPrivateKey& sk, ConstLWECiphertext& ct, LWEPlaintext* result, LWEPlaintextModulus p = 4) const;
 
-    //wkx
+   
     void Decrypt(ConstMNTRUPrivateKey& sk, ConstMNTRUCiphertext& ct, MNTRUPlaintext* result, MNTRUPlaintextModulus p = 4) const;
 
     void DecryptNAND(ConstMNTRUPrivateKey& sk, ConstMNTRUCiphertext& ct, MNTRUPlaintext* result, MNTRUPlaintextModulus p = 4) const;
@@ -364,10 +285,9 @@ public:
    * @param keygenMode key generation mode for symmetric or public encryption
    */
     void BTKeyGen(ConstLWEPrivateKey& sk, KEYGEN_MODE keygenMode = SYM_ENCRYPT);
-    void NBTKeyGen(ConstLWEPrivateKey& sk, KEYGEN_MODE keygenMode = SYM_ENCRYPT);//wkx
-    void MKBTKeyGen(ConstMNTRUPrivateKey& sk, KEYGEN_MODE keygenMode = SYM_ENCRYPT);//wkx
-    void MKBTKeyGen(ConstMKLWEPrivateKey& sk, KEYGEN_MODE keygenMode = SYM_ENCRYPT);//wkx
-    //生成NAND密文
+    void NBTKeyGen(ConstLWEPrivateKey& sk, KEYGEN_MODE keygenMode = SYM_ENCRYPT);
+    void MKBTKeyGen(ConstMNTRUPrivateKey& sk, KEYGEN_MODE keygenMode = SYM_ENCRYPT);//
+    void MKBTKeyGen(ConstMKLWEPrivateKey& sk, KEYGEN_MODE keygenMode = SYM_ENCRYPT);//
     void ctGateGen(ConstMNTRUPrivateKey& sk,const BINGATE gate);
 
 
@@ -382,7 +302,7 @@ public:
     }
     void NBTKeyLoad(const VectorNTRUBTKey& key) {
         m_NBTKey = key;
-    }//wkx
+    }//
 
     /**
    * Loads a bootstrapping key map element in the context (typically after deserializing)
@@ -404,7 +324,7 @@ public:
         m_BTKey.KSkey.reset();
         m_BTKey.Pkey.reset();
         m_BTKey_map.clear();
-        //wkx
+        //
         m_NBTKey.BSkey.reset();
         m_NBTKey.KSkey.reset();
         m_NBTKey.Pkey.reset();
@@ -412,7 +332,7 @@ public:
     }
 
 
-    //wkx
+    //
     MNTRUCiphertext EvalBinGate(const BINGATE gate, ConstMNTRUCiphertext& ct1, ConstMNTRUCiphertext& ct2 ) const;
 
     MKLWECiphertext EvalBinGate(const BINGATE gate, ConstMKLWECiphertext& ct1, ConstMKLWECiphertext& ct2 ) const;
@@ -544,7 +464,7 @@ public:
         }
         ar(::cereal::make_nvp("params", m_params));
         m_binfhescheme = std::make_shared<BinFHEScheme>(m_params->GetRingGSWParams()->GetMethod());
-        //wkx
+        //
         (m_params->GetVectorNTRUParams()->GetMethod());
     }
 

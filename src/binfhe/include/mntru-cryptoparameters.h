@@ -55,11 +55,11 @@ public:
    * @param baseKS the base used for key switching
    * @param keyDist the key distribution
    */
-    //explicit 可以有效地防止隐式转换带来的意外结果，提高代码的可读性和安全性。
+   
     explicit MNTRUCryptoParams(uint32_t k,uint32_t n, uint32_t N, const NativeInteger& q, const NativeInteger& Q,
                              const NativeInteger& q_KS, double std, uint32_t baseKS,
                              SecretKeyDist keyDist = UNIFORM_TERNARY)
-        : m_k(k), m_q(q), m_Q(Q), m_qKS(q_KS), m_n(n), m_N(N), m_baseKS(baseKS), m_keyDist(keyDist) //成员变量初始化
+        : m_k(k), m_q(q), m_Q(Q), m_qKS(q_KS), m_n(n), m_N(N), m_baseKS(baseKS), m_keyDist(keyDist) 
     {
         if(!m_k)
             OPENFHE_THROW(config_error, "m_k (number of users) can not be zero");
@@ -79,7 +79,7 @@ public:
         if (m_Q.GetMSB() > MAX_MODULUS_SIZE)
             OPENFHE_THROW(config_error, "Q.GetMSB() > MAX_MODULUS_SIZE");
         m_dgg.SetStd(std);
-        m_ks_dgg.SetStd(0.4);
+        m_ks_dgg.SetStd(std);
     }
 
     // TODO: add m_qKS, m_ks_dgg, and m_keyDist to copy/move operations?

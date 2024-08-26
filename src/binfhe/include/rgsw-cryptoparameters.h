@@ -59,39 +59,39 @@ namespace lbcrypto {
 class RingGSWCryptoParams : public Serializable {
 
 private:
-    // RingGSW/RingLWE方案的模数
+    
     // Modulus for the RingGSW/RingLWE scheme
     NativeInteger m_Q{};
 
-    // RingLWE方案的模数
+
     // Modulus for the RingLWE scheme
     NativeInteger m_q{};
 
-    // RingGSW/RingLWE方案的环维度
+ 
     // Ring dimension for the RingGSW/RingLWE scheme
     uint32_t m_N{};
 
-    // 用于引导的小工具基数
+
     // Gadget base used in bootstrapping
     uint32_t m_baseG{};
 
-    // 用于刷新密钥的基数（仅用于DM引导）
+
     // Base used for the refreshing key (used only for DM bootstrapping)
     uint32_t m_baseR{};
 
-    // 对整数模Q进行分解的位数
+ 
     // Number of digits in decomposing integers mod Q
     uint32_t m_digitsG{};
 
-    // m_baseR的幂次方（仅用于DM引导）
+ 
     // Powers of m_baseR (used only for DM bootstrapping)
     std::vector<NativeInteger> m_digitsR;
 
-    // baseG的幂次方向量
+
     // A vector of powers of baseG
     std::vector<NativeInteger> m_Gpower;
 
-    // 用于LMKCDEY的生成器g（=5）的对数向量
+  
     // A vector of log by generator g (=5) (only for LMKCDEY)
     // Not exactly log, but a mapping similar to logarithm for efficiency
     // m_logGen[5^i (mod M)] = i (i > 0)
@@ -100,36 +100,35 @@ private:
     // m_logGen[-1 (mod M)] = M (special case for efficiency)
     std::vector<int32_t> m_logGen;
 
-    // 错误分布生成器
+
     // Error distribution generator
     DiscreteGaussianGeneratorImpl<NativeVector> m_dgg;
 
-    // 用于符号评估的baseG幂次方向量的映射
+
     // A map of vectors of powers of baseG for sign evaluation
     std::map<uint32_t, std::vector<NativeInteger>> m_Gpower_map;
 
-    // RingGSW/RingLWE中多项式的参数
+
     // Parameters for polynomials in RingGSW/RingLWE
     std::shared_ptr<ILNativeParams> m_polyParams;
 
-    // 用于评估二进制门的常数
+
     // Constants used in evaluating binary gates
     std::vector<NativeInteger> m_gateConst;
 
-    // 以Format::EVALUATION表示的预先计算的多项式，用于X^m - 1（仅用于CGGI引导）
+
     // Precomputed polynomials in Format::EVALUATION representation for X^m - 1
     // (used only for CGGI bootstrapping)
     std::vector<NativePoly> m_monomials;
 
-    // 引导方法（DM或CGGI或LMKCDEY）
+
     // Bootstrapping method (DM or CGGI or LMKCDEY)
     BINFHE_METHOD m_method{BINFHE_METHOD::INVALID_METHOD};
 
-    // 秘密密钥分布: GAUSSIAN, UNIFORM_TERNARY, 等
     // Secret key distribution: GAUSSIAN, UNIFORM_TERNARY, etc.
     SecretKeyDist m_keyDist{SecretKeyDist::UNIFORM_TERNARY};
 
-    // 自同态密钥的数量（仅用于LMKCDEY引导）
+  
     // Number of automorphism keys (used only for LMKCDEY bootstrapping)
     uint32_t m_numAutoKeys{};
 

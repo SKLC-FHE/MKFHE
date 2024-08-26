@@ -1,75 +1,4 @@
-//==================================================================================
-// BSD 2-Clause License
-//
-// Copyright (c) 2014-2022, NJIT, Duality Technologies Inc. and other contributors
-//
-// All rights reserved.
-//
-// Author TPOC: contact@openfhe.org
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//==================================================================================
 
-
-/*
- * Custom Modifications:
- * - [This code is the implementation of the algorithm in the paper https://eprint.iacr.org/2023/1564]
- * 
- * This modified section follows the terms of the original BSD 2-Clause License.
- * Other modifications are provided under the terms of the BSD 2-Clause License.
- * See the BSD 2-Clause License text below:
- */
-
-
-//==================================================================================
-// Additional BSD License for Custom Modifications:
-//
-// Copyright (c) 2023 Binwu Xiang,Kaixing Wang and other contributors
-//
-// All rights reserved.
-//
-// Author TPOC: wangkaixing22@mails.ucas.ac.cn
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//==================================================================================
 #ifndef BINFHE_FHEW_H
 #define BINFHE_FHEW_H
 
@@ -82,7 +11,7 @@
 #include "rgsw-acc-cggi.h"
 #include "rgsw-acc-lmkcdey.h"
 
-//wkx
+
 #include "mntru-pke.h"
 #include "mklwe-pke.h"
 #include "ntru-ciphertext.h"
@@ -91,13 +20,13 @@
 #include "vntru-acckey.h"
 #include "vntru-acc.h"
 #include "vntru-acc-xzddf.h"
-//wkx
+
 #include "mk-acckey.h"
 #include "mk-acc.h"
 #include "mk-acc-xzw.h"
 #include "mk-acc-xzw_B.h"
 
-//wkx
+
 #include <NTL/ZZ_pX.h>
 #include <NTL/mat_ZZ_p.h>
 #include <NTL/mat_ZZ.h>
@@ -105,7 +34,7 @@
 #include <map>
 #include <memory>
 #include <vector>
-//wkx
+
 using namespace NTL;
 using namespace std;
 
@@ -122,7 +51,7 @@ typedef struct {
     LWEPublicKey Pkey;
 } RingGSWBTKey;
 
-// wkx
+
 typedef struct {
     // refreshing key
     VectorNTRUACCKey BSkey;
@@ -132,23 +61,25 @@ typedef struct {
     LWEPublicKey Pkey;
 } VectorNTRUBTKey;
 
-// wkx
+
 typedef struct {
     // refreshing key
     UniEncACCKey BSkey;
     // switching key
     MNTRUSwitchingKey KSkey;
+    
+    MNTRUSwitchingKey2 KSkey2;
 
     MKLWESwitchingKey LKSkey;
 
     std::vector<std::vector<NativePoly>> Pkey;  //
 
-    // std::vector<NativePoly> f;
-    // std::vector<NativeVector> fvec;//第二层私钥 系数形式
+    std::vector<NativePoly> f;
+    std::vector<NativeVector> fvec;
 
-    // std::vector<NativeVector> F_col0;
+    std::vector<NativeVector> F_col0;
 
-    // std::vector<NativeVector> lwesk;
+    std::vector<NativeVector> lwesk;
 } UniEncBTKey;
 
 
@@ -169,7 +100,7 @@ protected:
     std::shared_ptr<MKLWEEncryptionScheme> MKLWEscheme{std::make_shared<MKLWEEncryptionScheme>()};
 
     std::shared_ptr<RingGSWAccumulator> ACCscheme{nullptr};
-    //wkx
+
     std::shared_ptr<VectorNTRUAccumulator> NACCscheme{nullptr};
 
     std::shared_ptr<UniEncAccumulator> UniEncACCscheme{nullptr};
@@ -210,13 +141,11 @@ public:
             ACCscheme = std::make_shared<RingGSWAccumulatorCGGI>();
         else if (method == LMKCDEY)
             ACCscheme = std::make_shared<RingGSWAccumulatorLMKCDEY>();
-        else if (method == XZDDF)
-            NACCscheme = std::make_shared<VectorNTRUAccumulatorXZDDF>();
-        else if (method == XZWDF)
+        else if (method == MKNTRU)
             UniEncACCscheme = std::make_shared<UniEncAccumulatorXZW>();
-        else if (method == XZWDF_B || method == XZWDF_LWE)
+        else if (method == MKNTRU_B || method == MKNTRU_LWE)
         UniEncACCscheme = std::make_shared<UniEncAccumulatorXZW_B>();
-        // XZWDF_B XZWDF_T MKTFHE_B MKTFHE_T
+        // MKNTRU_B MKNTRU_T MKTFHE_B MKTFHE_T
         else
             OPENFHE_THROW(config_error, "method is invalid");
     }
@@ -232,10 +161,9 @@ public:
    */
     RingGSWBTKey KeyGen(const std::shared_ptr<BinFHECryptoParams>& params, ConstLWEPrivateKey& LWEsk,
                         KEYGEN_MODE keygenMode) const;
-    //wkx 
+   
     VectorNTRUBTKey NKeyGen(const std::shared_ptr<BinFHECryptoParams>& params, ConstLWEPrivateKey& LWEsk,
-                        KEYGEN_MODE keygenMode) const;
-    // 多密钥计算密钥生成                    
+                        KEYGEN_MODE keygenMode) const;                   
     UniEncBTKey MKKeyGen(const std::shared_ptr<BinFHECryptoParams>& params,ConstMNTRUPrivateKey& MNTRUsk,KEYGEN_MODE keygenMode) const;
 
     UniEncBTKey MKKeyGen(const std::shared_ptr<BinFHECryptoParams>& params,ConstMKLWEPrivateKey& MKLWEsk,KEYGEN_MODE keygenMode) const;
@@ -243,15 +171,15 @@ public:
     MNTRUCiphertext ctGateGen(const std::shared_ptr<BinFHECryptoParams>& params,ConstMNTRUPrivateKey& sk,const BINGATE gate) const;
 
 
-    //wkx mklwe
+
     MKLWECiphertext EvalBinGate(const std::shared_ptr<BinFHECryptoParams>& params, BINGATE gate,const UniEncBTKey& EK, ConstMKLWECiphertext& ct1,ConstMKLWECiphertext& ct2) const;
 
 
-    //wkx mkfhe
+
     MNTRUCiphertext EvalBinGate(const std::shared_ptr<BinFHECryptoParams>& params, BINGATE gate,const UniEncBTKey& EK, ConstMNTRUCiphertext& ct1,ConstMNTRUCiphertext& ct2,ConstMNTRUCiphertext& ctNAND) const;
 
 
-    //wkx 
+
     LWECiphertext EvalBinGate(const std::shared_ptr<BinFHECryptoParams>& params, BINGATE gate, const VectorNTRUBTKey& EK,
                               ConstLWECiphertext& ct1, ConstLWECiphertext& ct2) const;
 
@@ -356,14 +284,13 @@ public:
                                           const NativeInteger& beta) const;
 
 private:
-    // mklwe + 多密钥第二层密文 UniEnc 多项式密文
+
     MKACCCiphertext BootstrapGateCore(const std::shared_ptr<BinFHECryptoParams>& params, BINGATE gate,
-                                     ConstUniEncACCKey& ek,std::vector<std::vector<NativePoly>> Pkey,ConstMKLWECiphertext& ct) const;
+                                     ConstUniEncACCKey& ek,std::vector<std::vector<NativePoly>> Pkey,std::vector<NativePoly> skf,ConstMKLWECiphertext& ct) const;
 
 
-    // mntru + 多密钥第二层密文 UniEnc 多项式密文
     MKACCCiphertext BootstrapGateCore(const std::shared_ptr<BinFHECryptoParams>& params, BINGATE gate,
-                                     ConstUniEncACCKey& ek,std::vector<std::vector<NativePoly>> Pkey,ConstMNTRUCiphertext& ct) const;
+                                     ConstUniEncACCKey& ek,std::vector<std::vector<NativePoly>> Pkey,std::vector<NativePoly> skf,ConstMNTRUCiphertext& ct) const;
 
 
 
@@ -415,7 +342,7 @@ private:
                                 ConstLWECiphertext& ct, const Func f, const NativeInteger& fmod) const;
 
 };
-//wkx
+
 void Get_invertible_NativeVector(NativeVector& NatVec,NativeVector& NatVec_inv,uint32_t q_boot,uint32_t N, SecretKeyDist keyDist);
 }  // namespace lbcrypto
 

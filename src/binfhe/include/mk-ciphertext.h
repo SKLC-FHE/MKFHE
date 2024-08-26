@@ -39,6 +39,7 @@
 
 #include "mntru-ciphertext.h"
 #include "mntru-keyswitchkey.h"
+#include "mntru-keyswitchkey2.h"
 #include "mntru-privatekey.h"
 #include "mntru-cryptoparameters.h"
 

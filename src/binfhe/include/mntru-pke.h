@@ -5,19 +5,20 @@
 #include "binfhe-constants.h"
 #include "mntru-ciphertext.h"
 #include "mntru-keyswitchkey.h"
+#include "mntru-keyswitchkey2.h"
 #include "mntru-privatekey.h"
 // #include "mntru-publickey.h"
 // #include "mntru-keypair.h"
 #include "mntru-cryptoparameters.h"
 
 
-//wkx
+//
 #include <NTL/ZZ_pX.h>
 #include <NTL/mat_ZZ_p.h>
 #include <NTL/mat_ZZ.h>
 
 #include <memory>
-//wkx
+//
 using namespace NTL;
 using namespace std;
 namespace lbcrypto {
@@ -60,6 +61,12 @@ public:
 
     MNTRUCiphertext KeySwitch(const std::shared_ptr<MNTRUCryptoParams>& params, ConstMNTRUSwitchingKey& K,
                             ConstMNTRUCiphertext& ctQN) const;
+
+    MNTRUSwitchingKey2 KeySwitchGen2(const std::shared_ptr<MNTRUCryptoParams>& params, ConstMNTRUPrivateKey& sk, const std::vector<NativeVector> skN) const;
+
+    MNTRUCiphertext KeySwitch2(const std::shared_ptr<MNTRUCryptoParams>& params, ConstMNTRUSwitchingKey2& K,
+                            ConstMNTRUCiphertext& ctQN) const;
+
 
 
     void EvalSubEq(MNTRUCiphertext& ct1, ConstMNTRUCiphertext& ct2) const;

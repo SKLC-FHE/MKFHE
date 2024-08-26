@@ -54,7 +54,7 @@ RingGSWACCKey RingGSWAccumulatorLMKCDEY::KeyGenAcc(const std::shared_ptr<RingGSW
     for (size_t i = 0; i < n; ++i) {
         auto s{sv[i].ConvertToInt<int32_t>()};
         (*ek)[0][0][i] = KeyGenLMKCDEY(params, skNTT, s > modHalf ? s - mod : s);
-        //如果s大于modHalf，则返回s - mod，否则返回s
+       
     }
 
     NativeInteger gen = NativeInteger(5);
@@ -168,7 +168,7 @@ RingGSWEvalKey RingGSWAccumulatorLMKCDEY::KeyGenLMKCDEY(const std::shared_ptr<Ri
 
     DiscreteUniformGeneratorImpl<NativeVector> dug;
     NativeInteger Q{params->GetQ()};
-    dug.SetModulus(Q);//确保dug的模数是Q
+    dug.SetModulus(Q);//
     // Reduce mod q (dealing with negative number as well)
     int64_t q  = params->Getq().ConvertToInt<int64_t>();//
     int64_t N  = params->GetN();
@@ -206,7 +206,7 @@ RingGSWEvalKey RingGSWAccumulatorLMKCDEY::KeyGenAuto(const std::shared_ptr<RingG
                                                      const NativePoly& skNTT, LWEPlaintext k) const {
     auto polyParams{params->GetPolyParams()};
     // m_polyParams{std::make_shared<ILNativeParams>(2 * N, Q)},
-    auto Gpow{params->GetGPower()};//m_Gpower,是一个3长度vector (0,1024,1048576)
+    auto Gpow{params->GetGPower()};//
 
     DiscreteUniformGeneratorImpl<NativeVector> dug;
     NativeInteger Q{params->GetQ()};

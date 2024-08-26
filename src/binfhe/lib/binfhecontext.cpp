@@ -1,77 +1,4 @@
-//==================================================================================
-// BSD 2-Clause License
-//
-// Copyright (c) 2014-2022, NJIT, Duality Technologies Inc. and other contributors
-//
-// All rights reserved.
-//
-// Author TPOC: contact@openfhe.org
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//==================================================================================
 
-/*
-  Implementation file for Boolean Circuit FHE context class
- */
-
-/*
- * Custom Modifications:
- * - [This code is the implementation of the algorithm in the paper https://eprint.iacr.org/2023/1564]
- * 
- * This modified section follows the terms of the original BSD 2-Clause License.
- * Other modifications are provided under the terms of the BSD 2-Clause License.
- * See the BSD 2-Clause License text below:
- */
-
-//==================================================================================
-// Additional BSD License for Custom Modifications:
-//
-// Copyright (c) 2023 Binwu Xiang,Kaixing Wang and other contributors
-//
-// All rights reserved.
-//
-// Author TPOC: wangkaixing22@mails.ucas.ac.cn
-//
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//
-// 1. Redistributions of source code must retain the above copyright notice, this
-//    list of conditions and the following disclaimer.
-//
-// 2. Redistributions in binary form must reproduce the above copyright notice,
-//    this list of conditions and the following disclaimer in the documentation
-//    and/or other materials provided with the distribution.
-//
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-// FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-// DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-// SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-// CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-// OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//==================================================================================
 #include "binfhecontext.h"
 #include <string>
 #include <unordered_map>
@@ -81,7 +8,7 @@ namespace lbcrypto {
 void BinFHEContext::GenerateBinFHEContext(uint32_t n, uint32_t N, const NativeInteger& q, const NativeInteger& Q,
                                           double std, uint32_t baseKS, uint32_t baseG, uint32_t baseR,
                                           SecretKeyDist keyDist, BINFHE_METHOD method, uint32_t numAutoKeys) {
-    //用 std::make_shared 创建了 std::shared_ptr 的智能指针实例
+
     auto lweparams = std::make_shared<LWECryptoParams>(n, N, q, Q, Q, std, baseKS);
     auto rgswparams =
         std::make_shared<RingGSWCryptoParams>(N, Q, q, baseG, baseR, method, std, keyDist, true, numAutoKeys);
@@ -152,16 +79,15 @@ void BinFHEContext::GenerateBinFHEContext(BINFHE_PARAMSET set, bool arbFunc, uin
 #endif
 }
 
-//用这个
+
 void BinFHEContext::GenerateBinFHEContext(BINFHE_PARAMSET set, BINFHE_METHOD method) {
     enum { PRIME = 0 };  // value for modKS if you want to use the intermediate prime for modulus for key switching
-    constexpr double STD_DEV  = 2.0;
-    constexpr double STD_NTRU = 0.9;
+    constexpr double STD_DEV  = 1.9;
+    constexpr double STD_NTRU = 0.5;
+    constexpr double STD_NTRU2 = 0.75;
     // clang-format off
 
-    /*
-    gadgetBase就是baseG
-    */
+
     const std::unordered_map<BINFHE_PARAMSET, BinFHEContextParams> paramsMap
     ({
         //               numUser|numberBits|cyclOrder|latticeParam|  mod|   modKS|  stdDev| baseKS| gadgetBase| baseRK| numAutoKeys| keyDist
@@ -194,22 +120,29 @@ void BinFHEContext::GenerateBinFHEContext(BINFHE_PARAMSET set, BINFHE_METHOD met
         { P128T,             { 1,        21,     2048,         512, 1024, 1 << 14, STD_NTRU,    32,    1 <<  7,  32,    10,  UNIFORM_TERNARY} },
         { P128G,             { 1,        21,     2048,         446, 1024, 1 << 14, STD_NTRU,    32,    1 <<  7,  32,    10,  GAUSSIAN       } },
         { P128T_2,           { 1,        21,     2048,         512, 1024, 1 << 14, STD_NTRU,    32,    1 <<  6,  32,    10,  UNIFORM_TERNARY} },
-        { P128G_2,           { 1,        21,     2048,         446, 1024, 1 << 14, STD_NTRU,    32,    1 <<  6,  32,    10,  GAUSSIAN       } },
+        { P128G_2,           { 1,        21,     2048,         446, 1024, 1 << 14, STD_NTRU,    32,    1 <<  5,  32,    10,  GAUSSIAN       } },
         //               numuser|numberBits|cyclOrder|latticeParam|  mod|   modKS|  stdDev| baseKS| gadgetBase| baseRK| numAutoKeys| keyDist
         { P192T,             { 1,        26,     4096,        1024, 1024, 1 << 17, STD_NTRU,    28,    1 <<  9,  32,    10,  UNIFORM_TERNARY} },
         { P192G,             { 1,        26,     4096,         805, 1024, 1 << 17, STD_NTRU,    28,    1 <<  9,  32,    10,  GAUSSIAN       } },
         //MK-FHE
-        //               numuser|numberBits|cyclOrder|latticeParam|  mod|   modKS|  stdDev| baseKS| gadgetBase| baseRK| numAutoKeys| keyDist
-     { STD128_XZWDF,      {2,        27,    4096,          710,     45181, 45181,      1 ,    32,    1 <<  9,  32,    10,  UNIFORM_TERNARY} },
-     { STD128_XZWDF_2,      {4,        27,    4096,          710,     45181, 45181,      1 ,    32,    1 <<  9,  32,    10,  UNIFORM_TERNARY} },
-     { STD128_XZWDF_3,      {8,        27,    4096,          710,     45181, 45181,      1 ,    32,    1 <<  7,  32,    10,  UNIFORM_TERNARY} },
-     { STD128_XZWDF_4,      {16,        27,    4096,          710,     45181, 45181,      1 ,    32,    1 <<  7,  32,    10,  UNIFORM_TERNARY} },
-        { STD128_XZWDF_LWE,  {2,        27,   4096,       630,     16381, 16381,     STD_DEV,    32,    1 << 9 ,  2,    10,  BINARY} },
-        { STD128_XZWDF_LWE_2,  {4,        27,   4096,       630,     16381, 16381,     STD_DEV,    32,    1 << 9 ,  2,    10,  BINARY} },
-        { STD128_XZWDF_LWE_3,  {9,        27,   4096,       630,     16381, 16381,     STD_DEV,    32,    1 << 6 ,  2,    10,  BINARY} },
-        { STD128_XZWDF_LWE_4,  {16,        27,   4096,       630,     16381, 16381,     STD_DEV,    32,    1 << 6 ,  2,    10,  BINARY} },
-        // { STD128_XZWDF_LWE_B,{2,        27,    8,          2,     131071, 131071,      0.9 ,    32,    1 <<  7,  32,    10,  UNIFORM_TERNARY} },
-
+                             //numuser|numberBits|cyclOrder|latticeParam|  mod|   modKS|  stdDev| baseKS| gadgetBase| baseRK| numAutoKeys| keyDist
+     { STD128_MKNTRU,        {2,          27,    4096,             765,     45181,45181,       STD_NTRU ,    32,    1 <<  7,  32,    10,  UNIFORM_TERNARY} },
+     { STD128_MKNTRU_2,      {4,          27,    4096,             765,     45181, 45181,      STD_NTRU ,    32,    1 <<  7,  32,    10,  UNIFORM_TERNARY} },
+     { STD128_MKNTRU_3,      {8,          27,    4096,             765,     45181, 45181,      STD_NTRU ,    32,    1 <<  6,  32,    10,  UNIFORM_TERNARY} },
+     { STD128_MKNTRU_4,      {16,         27,    4096,             765,     45181, 45181,      STD_NTRU,    32,    1 <<  5,  32,    10,  UNIFORM_TERNARY} },
+     { STD128_MKNTRU_LWE,    {2,          27,    4096,             635,     32749, 32749,      STD_DEV,    32,    1 << 9 ,  2,    10,  BINARY} },
+     { STD128_MKNTRU_LWE_2,  {4,          27,    4096,             635,     32749, 32749,      STD_DEV,    32,    1 << 9 ,  2,    10,  BINARY} },
+     { STD128_MKNTRU_LWE_3,  {8,          27,    4096,             635,     32749, 32749,      STD_DEV,    32,    1 << 9,  2,    10,  BINARY} },
+     { STD128_MKNTRU_LWE_4,  {16,         27,    4096,             635,     32749, 32749,      STD_DEV,    32,    1 << 7,  2,    10,  BINARY} },
+     { STD100_MKNTRU,        {2,           27,    4096,            560,     45181,45181,        STD_NTRU2 ,    32,    1 <<  9,  32,    10,  UNIFORM_TERNARY} },
+     { STD100_MKNTRU_2,      {4,          27,     4096,            560,     45181, 45181,       STD_NTRU2,    32,    1 <<  9,  32,    10,  UNIFORM_TERNARY} },
+     { STD100_MKNTRU_3,      {8,          27,     4096,            560,     45181, 45181,       STD_NTRU2 ,    32,    1 <<  9,  32,    10,  UNIFORM_TERNARY} },
+     { STD100_MKNTRU_4,      {16,         27,     4096,            560,     45181, 45181,       STD_NTRU2,    32,    1 <<  9,  32,    10,  UNIFORM_TERNARY} },
+     { STD100_MKNTRU_LWE,    {2,          27,    4096,             500,     32749, 32749,     STD_DEV,    32,    1 << 9 ,  2,    10,  BINARY} },
+     { STD100_MKNTRU_LWE_2,  {4,          27,    4096,             500,     32749, 32749,     STD_DEV,    32,    1 << 9 ,  2,    10,  BINARY} },
+     { STD100_MKNTRU_LWE_3,  {8,          27,    4096,             500,     32749, 32749,     STD_DEV,    32,    1 << 9,  2,    10,  BINARY} },
+     { STD100_MKNTRU_LWE_4,  {16,         27,    4096,             500,     32749, 32749,     STD_DEV,    32,    1 << 9,  2,    10,  BINARY} },
+    // { STD128_MKNTRU_LWE_B,{2,        27,    8,          2,     131071, 131071,      0.9 ,    32,    1 <<  7,  32,    10,  UNIFORM_TERNARY} },
     });
     // clang-format on
 
@@ -237,19 +170,14 @@ void BinFHEContext::GenerateBinFHEContext(BINFHE_PARAMSET set, BINFHE_METHOD met
     auto mklweparams = std::make_shared<MKLWECryptoParams>(params.numUser, params.latticeParam, ringDim, params.mod, Q,
                                                            params.modKS, params.stdDev, params.baseKS, params.keyDist);
 
-    if (method == XZDDF) {
-        auto vntruparams =
-            std::make_shared<VectorNTRUCryptoParams>(ringDim, Q, params.mod, params.gadgetBase, params.baseRK, method,
-                                                     params.stdDev, params.keyDist, false, params.numAutoKeys);
-        m_params = std::make_shared<BinFHECryptoParams>(lweparams, vntruparams);
-    }
-    else if (method == XZWDF || method == XZWDF_B) {
+   
+    if (method == MKNTRU || method == MKNTRU_B) {
         auto uniencparams = std::make_shared<UniEncCryptoParams>(
             params.numUser, ringDim, Q, params.mod, params.gadgetBase, params.baseRK, method, params.stdDev,
             params.keyDist, false, params.numAutoKeys);
         m_params = std::make_shared<BinFHECryptoParams>(mntruparams, uniencparams);
     }
-    else if (method == XZWDF_LWE) {
+    else if (method == MKNTRU_LWE) {
         auto uniencparams = std::make_shared<UniEncCryptoParams>(
             params.numUser, ringDim, Q, params.mod, params.gadgetBase, params.baseRK, method, params.stdDev,
             params.keyDist, false, params.numAutoKeys);
@@ -260,7 +188,7 @@ void BinFHEContext::GenerateBinFHEContext(BINFHE_PARAMSET set, BINFHE_METHOD met
             std::make_shared<RingGSWCryptoParams>(ringDim, Q, params.mod, params.gadgetBase, params.baseRK, method,
                                                   params.stdDev, params.keyDist, false, params.numAutoKeys);
         m_params = std::make_shared<BinFHECryptoParams>(lweparams, rgswparams);
-    }  //wkx
+    }  //
 
     m_binfhescheme = std::make_shared<BinFHEScheme>(method);
 }
@@ -290,8 +218,7 @@ void BinFHEContext::GenerateBinFHEContext(const BinFHEContextParams& params, BIN
 LWEPrivateKey BinFHEContext::KeyGen() const {
     auto& LWEParams =
         m_params
-            ->GetLWEParams();  //m_params是指向BinFHECryptoParams对象的共享指针,GetLWEParams()返回的是指向LWECryptoParams对象的共享指针
-    //根据LWE参数中"分布"这个枚举变量，选择合适的分布
+            ->GetLWEParams();  
     if (LWEParams->GetKeyDist() == GAUSSIAN)
         return m_LWEscheme->KeyGenGaussian(LWEParams->Getn(), LWEParams->GetqKS());
     return m_LWEscheme->KeyGen(LWEParams->Getn(), LWEParams->GetqKS());
@@ -304,7 +231,7 @@ LWEPrivateKey BinFHEContext::KeyGenN() const {
     return m_LWEscheme->KeyGen(LWEParams->GetN(), LWEParams->GetQ());
 }
 
-//wkx
+//
 MNTRUPrivateKey BinFHEContext::MNTRU_KeyGen() const {
     // cout<<"In binfhecontext MNTRU_KeyGen"<<endl;
     auto& MNTRUParams = m_params->GetMatrixNTRUParams();
@@ -425,7 +352,7 @@ void BinFHEContext::Decrypt2(ConstMNTRUPrivateKey& sk, ConstMNTRUCiphertext& ct,
     m_MNTRUscheme->Decrypt2(MNTRUParams, sk, ct, result, p);
 }
 
-/*--------------------------wkx mklwe ------------------------------------*/
+
 void BinFHEContext::Decrypt(ConstMKLWEPrivateKey& sk, ConstMKLWECiphertext& ct, MKLWEPlaintext* result,
                             MKLWEPlaintextModulus p) const {
     auto&& MKLWEParams = m_params->GetMKLWEParams();
@@ -450,7 +377,7 @@ void BinFHEContext::BTKeyGen(ConstLWEPrivateKey& sk, KEYGEN_MODE keygenMode) {
 
     auto temp = RGSWParams->GetBaseG();
 
-    //预先生成一些密钥
+ 
     if (m_timeOptimization) {
         auto gpowermap = RGSWParams->GetGPowerMap();
         for (std::map<uint32_t, std::vector<NativeInteger>>::iterator it = gpowermap.begin(); it != gpowermap.end();
@@ -474,8 +401,8 @@ LWECiphertext BinFHEContext::EvalBinGate(const BINGATE gate, ConstLWECiphertext&
     //std::cout<<"LWECiphertext BinFHEContext::EvalBinGate"<<std::endl;
     auto& VNTRUParams = m_params->GetVectorNTRUParams();
 
-    if (VNTRUParams != nullptr) {  //需要改成m_NBTKey
-        //std::cout<<"EvalBinGate XZDDF"<<std::endl;
+    if (VNTRUParams != nullptr) {  
+     
         return m_binfhescheme->EvalBinGate(m_params, gate, m_NBTKey, ct1, ct2);
     }
     else {
@@ -568,13 +495,13 @@ void BinFHEContext::NBTKeyGen(ConstLWEPrivateKey& sk, KEYGEN_MODE keygenMode) {
 
     auto temp = VNTRUParams->GetBaseG();
 
-    //预先生成一些密钥
+
     if (m_timeOptimization) {
         auto gpowermap = VNTRUParams->GetGPowerMap();
         for (std::map<uint32_t, std::vector<NativeInteger>>::iterator it = gpowermap.begin(); it != gpowermap.end();
              ++it) {
             VNTRUParams->Change_BaseG(it->first);
-            //这是将新生成的密钥赋值给m_NBTKey_map中与当前键（it->first）关联的值。如果it->first不存在于m_NBTKey_map中，这个操作将创建一个新的键值对；如果已经存在，将替换现有的值。
+          
             m_NBTKey_map[it->first] = m_binfhescheme->NKeyGen(m_params, sk, keygenMode);
             // m_NBTKey_map[it->first] = m_binfhescheme->NKeyGen(m_params, sk, keygenMode);
         }
@@ -596,7 +523,7 @@ void BinFHEContext::MKBTKeyGen(ConstMNTRUPrivateKey& sk, KEYGEN_MODE keygenMode)
 
     auto temp = UniEncParams->GetBaseG();
 
-    //预先生成一些密钥
+
     if (m_timeOptimization) {
         auto gpowermap = UniEncParams->GetGPowerMap();
         for (std::map<uint32_t, std::vector<NativeInteger>>::iterator it = gpowermap.begin(); it != gpowermap.end();
@@ -622,7 +549,7 @@ void BinFHEContext::MKBTKeyGen(ConstMKLWEPrivateKey& sk, KEYGEN_MODE keygenMode)
 
     auto temp = UniEncParams->GetBaseG();
 
-    //预先生成一些密钥
+
     if (m_timeOptimization) {
         auto gpowermap = UniEncParams->GetGPowerMap();
         for (std::map<uint32_t, std::vector<NativeInteger>>::iterator it = gpowermap.begin(); it != gpowermap.end();
@@ -642,7 +569,7 @@ void BinFHEContext::MKBTKeyGen(ConstMKLWEPrivateKey& sk, KEYGEN_MODE keygenMode)
     }
 }
 
-//wkx
+//
 void BinFHEContext::ctGateGen(ConstMNTRUPrivateKey& sk, const BINGATE gate) {
     m_ctNAND = m_binfhescheme->ctGateGen(m_params, sk, gate);
 }

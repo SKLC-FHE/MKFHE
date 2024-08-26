@@ -22,7 +22,7 @@ using ConstMNTRUSwitchingKey = const std::shared_ptr<const MNTRUSwitchingKeyImpl
  */
 class MNTRUSwitchingKeyImpl : public Serializable {
 private:
-    std::vector<std::vector<NativeVector>> m_key;  //k N*d_ks 个n维NativeVector
+    std::vector<std::vector<NativeVector>> m_key;  
 public:
     MNTRUSwitchingKeyImpl() = default;
 

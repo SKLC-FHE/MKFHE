@@ -40,23 +40,31 @@ UniEncACCKey UniEncAccumulatorXZW_B::KeyGenAcc(const std::shared_ptr<UniEncCrypt
                                              const ConstMNTRUPrivateKey& MNTRUsk,
                                              const std::vector<NativePoly>& CRS) const {
     // std::cout << "In mk acc xzw KeyGenAcc" << std::endl;
-    std::vector<NativeVector> sv = MNTRUsk->GetF_col0();  // F的第一列
-   
+    std::vector<NativeVector> sv = MNTRUsk->GetF_col0();  
+
 
     uint32_t n = sv[0].GetLength();
     uint32_t k = sv.size();
     auto ek    = std::make_shared<UniEncACCKeyImpl>(k, 1, n + 1);
 
+
     for (uint32_t u = 0; u < k; u++) {
         auto& ek00 = (*ek)[u][0];  // evk
+        //std::cout<<"u = "<<u<<std::endl;
         for (uint32_t i = 0; i < n; ++i) {
+            //std::cout<<"i = "<<i<<std::endl;
             auto s = sv[u][i].ConvertToInt();
+            //cout<<"s = "<<s<<endl;
             if (u == 0 && i == 0) {
+                //std::cout<<"00"<<std::endl;
                 ek00[i] = KDMKeyGenXZW(params, invskNTT[u], CRS, s == 1 ? 1 : 0);
                 ek00[n] = KDMKeyGenXZW(params, invskNTT[u], CRS, 1);  //evk_1,0* = Enc(1/s_1)
             }
             else {
+                //std::cout<<"11"<<std::endl;
+                // std::cout<<"ek00[i]"<<ek00[i]<<std::endl;
                 ek00[i] = KeyGenXZW(params, invskNTT[u], CRS, s == 1 ? 1 : 0);
+                // std::cout<<"ek00[i]"<<ek00[i]<<std::endl;
             }
         }
     }
@@ -68,10 +76,12 @@ UniEncACCKey UniEncAccumulatorXZW_B::KeyGenAcc(const std::shared_ptr<UniEncCrypt
                                              const std::vector<NativePoly>& invskNTT,
                                              const ConstMKLWEPrivateKey& MKLWEsk,
                                              const std::vector<NativePoly>& CRS) const {
-    // std::cout << "In mk acc xzw KeyGenAcc" << std::endl;
+   
     std::vector<NativeVector> sv = MKLWEsk->GetElement();  
     uint32_t n = sv[0].GetLength();
     uint32_t k = sv.size();
+
+
 
     auto ek    = std::make_shared<UniEncACCKeyImpl>(k, 1, n + 1);
     for (uint32_t u = 0; u < k; u++) {
@@ -91,24 +101,35 @@ UniEncACCKey UniEncAccumulatorXZW_B::KeyGenAcc(const std::shared_ptr<UniEncCrypt
 }
 
 void UniEncAccumulatorXZW_B::EvalAcc(const std::shared_ptr<UniEncCryptoParams>& params, ConstUniEncACCKey& ek,
-                                   std::vector<std::vector<NativePoly>> Pkey,
+                                   std::vector<std::vector<NativePoly>> Pkey, std::vector<NativePoly> skf,
                                    MKACCCiphertext& acc, const std::vector<NativeVector>& ct) const {
+    // const auto& B = Pkey;
     // std::cout << "In UniEncAccumulatorXZW_B EvalACC" << std::endl;
     uint32_t k  = ct.size();
     uint32_t n  = ct[0].GetLength();
+   // auto mod    = ct[0].GetModulus();  //q
+    // auto MbyMod = NativeInteger(2 * params->GetN()) / mod;
+//  auto N = params->GetN();
+   
 
    
     for (uint32_t u = 0; u < k; u++) {
         for (size_t i = 0; i < n; ++i) {
             if (u == 0 && i == 0) {
-                AddToAccXZW0(params, (*ek)[u][0][n], (*ek)[u][0][i], ct[u][i], Pkey, u, acc);
+                // cout << "u = "<<u<<" i = "<<i << endl;
+                AddToAccXZW0(params, (*ek)[u][0][n], (*ek)[u][0][i], ct[u][i], Pkey, u, acc,skf);
+                
             }
 
             else {
-                AddToAccXZW(params, (*ek)[u][0][i], ct[u][i], Pkey, u, acc);
+                // cout << "u = "<<u<<" i = "<<i << endl;
+                AddToAccXZW(params, (*ek)[u][0][i], ct[u][i], Pkey, u, acc,skf);
+
+              
             }
         }
     }
+   
 }
 
 UniEncEvalKey UniEncAccumulatorXZW_B::KeyGenXZW(const std::shared_ptr<UniEncCryptoParams>& params,
@@ -120,31 +141,28 @@ UniEncEvalKey UniEncAccumulatorXZW_B::KeyGenXZW(const std::shared_ptr<UniEncCryp
     //std::cout<<"In KeyGenXZW:"<<std::endl;
     NativeInteger Q{params->GetQ()};
     uint32_t digitsG{(params->GetDigitsG() - 1)};
-    //生成私钥r
+   
     TernaryUniformGeneratorImpl<NativeVector> tug;
     NativePoly skrPoly(polyParams);
     usint hw = 2;
     NativeVector r = tug.GenerateVector(N, Q,hw);
-    // NativeVector r = tug.GenerateVector(N, Q);
+    
     skrPoly.SetValues(r, Format::COEFFICIENT);
-  //  cout << "skr" << r << endl;
+
     skrPoly.SetFormat(Format::EVALUATION);
-    /**------------生成私钥r=0------------*/
-    // NativePoly skrPoly(polyParams, EVALUATION, true);
-    /**------------生成私钥r=0------------*/
+    
 
     UniEncEvalKeyImpl result(digitsG, 2);  //  (d,f) R^d x R^d
 
-    //std::cout<<"11"<<std::endl;
-    //UniEncEvalKeyImpl result;
+
     for (uint32_t i = 0; i < digitsG; ++i) {
-        //初始化生成一个noise 向量 e0 e1
+   
         result[i][0] = NativePoly(params->GetDgg(), polyParams, Format::COEFFICIENT);
         result[i][1] = NativePoly(params->GetDgg(), polyParams, Format::COEFFICIENT);
         result[i][1].SetFormat(Format::EVALUATION);
         result[i][0].SetFormat(Format::EVALUATION);
 
-        //构造一个B^i*r的多项式
+
         NativeVector gd_vec(N, Q);
         gd_vec[0] = Gpow[i + 1];
        // cout << "B_i" << Gpow[i + 1] << endl;
@@ -160,6 +178,11 @@ UniEncEvalKey UniEncAccumulatorXZW_B::KeyGenXZW(const std::shared_ptr<UniEncCryp
         }
         result[i][0] = result[i][0] + skrPoly[i] * CRS[i];  //  r*CRS +  e0 + B^i
     }
+
+   
+
+
+
     return std::make_shared<UniEncEvalKeyImpl>(result);
 }
 
@@ -171,25 +194,28 @@ UniEncEvalKey UniEncAccumulatorXZW_B::KDMKeyGenXZW(const std::shared_ptr<UniEncC
     auto N                 = params->GetN();
     NativeInteger Q{params->GetQ()};
     uint32_t digitsG{(params->GetDigitsG() - 1)};
-    //生成私钥r
+
     TernaryUniformGeneratorImpl<NativeVector> tug;
     NativePoly skrPoly(polyParams);
     usint hw=2;
     NativeVector r = tug.GenerateVector(N, Q,hw);
     skrPoly.SetValues(r, Format::COEFFICIENT);
-   // cout << "KDMskr" << r << endl;
+   
     skrPoly.SetFormat(Format::EVALUATION);
+    
 
     UniEncEvalKeyImpl result(digitsG, 2);  //  (d,f) R^d x R^d
 
+    //UniEncEvalKeyImpl result;
     for (uint32_t i = 0; i < digitsG; ++i) {
-        //初始化生成一个noise 向量 e0 e1
+ 
         result[i][0] = NativePoly(params->GetDgg(), polyParams, Format::COEFFICIENT);
+       // cout<< result[i][0] <<endl;
         result[i][1] = NativePoly(params->GetDgg(), polyParams, Format::COEFFICIENT);
         result[i][1].SetFormat(Format::EVALUATION);
         result[i][0].SetFormat(Format::EVALUATION);
 
-        //构造一个B^i*r的多项式
+
         NativeVector gd_vec(N, Q);
         gd_vec[0] = Gpow[i + 1];
         NativePoly gd(polyParams);
@@ -211,24 +237,29 @@ UniEncEvalKey UniEncAccumulatorXZW_B::KDMKeyGenXZW(const std::shared_ptr<UniEncC
 void UniEncAccumulatorXZW_B::HbProd(const std::shared_ptr<UniEncCryptoParams>& params, std::vector<NativePoly>& d,
                                   std::vector<NativePoly>& f, uint32_t index, std::vector<std::vector<NativePoly>> Pkey,
                                   MKACCCiphertext& acc) const {
-    //std::cout << "In UniEncAccumulatorXZW_B HbProd" << std::endl;
+    
     std::vector<NativePoly> ct(acc->GetElements());  //(c1,...,c_k)
     auto k = params->Getk();
 
+
     for (uint32_t u = 0; u < k; u++) {
         ct[u].SetFormat(Format::COEFFICIENT);
-        //cout << "分解前的ct" << ct[u] << endl;
+      
     }
 
     uint32_t digitsG{(params->GetDigitsG() - 1)};  // d-1
     
-
+    // std::cout<<"0"<<std::endl;
     auto polyParams = params->GetPolyParams();
 
+    // uint32_t MInt{2 * params->GetN()};
+    // NativeInteger M{MInt};
+    // std::cout<<"1"<<std::endl;
     NativePoly sumV(polyParams);
     for (uint32_t u = 0; u < k; u++) {
         std::vector<NativePoly> dct(digitsG, NativePoly(params->GetPolyParams(), Format::COEFFICIENT, true));
-        SignedDigitDecompose(params, ct[u], dct);  // 每个c分解为d-1维度
+        SignedDigitDecompose(params, ct[u], dct);  // 
+       
 
 #pragma omp parallel for num_threads(OpenFHEParallelControls.GetThreadLimit(digitsG))
         for (uint32_t i = 0; i < digitsG; ++i)
@@ -246,7 +277,7 @@ void UniEncAccumulatorXZW_B::HbProd(const std::shared_ptr<UniEncCryptoParams>& p
 
     sumV.SetFormat(Format::COEFFICIENT);
     std::vector<NativePoly> dct(digitsG, NativePoly(params->GetPolyParams(), Format::COEFFICIENT, true));
-    SignedDigitDecompose(params, sumV, dct);  // 每个c分解为d维度
+    SignedDigitDecompose(params, sumV, dct);  
 
 #pragma omp parallel for num_threads(OpenFHEParallelControls.GetThreadLimit(digitsG))
     for (uint32_t i = 0; i < digitsG; ++i)
@@ -266,13 +297,28 @@ void UniEncAccumulatorXZW_B::HbProd(const std::shared_ptr<UniEncCryptoParams>& p
 void UniEncAccumulatorXZW_B::AddToAccXZW(const std::shared_ptr<UniEncCryptoParams>& params, ConstUniEncEvalKey& ek1,
                                        const NativeInteger& c,
                                        std::vector<std::vector<NativePoly>> Pkey, uint32_t index,
-                                       MKACCCiphertext& acc) const {
+                                       MKACCCiphertext& acc,std::vector<NativePoly> skf) const {
    // std::cout << "In UniEncAccumulatorXZW_B AddToAccXZW" << std::endl;
     uint32_t MInt{2 * params->GetN()};
     NativeInteger M{MInt};
    uint32_t indexPos{c.ConvertToInt<uint32_t>()};
 //std::cout << "indexPos = " << indexPos << std::endl;
     const NativePoly& monomial = params->GetMonomial(indexPos == MInt ? 0 : indexPos);
+
+    // NativePoly Xc = monomial;
+    // std::cout << "Xc -1 = " << Xc << std::endl;
+    // Xc.SetFormat(COEFFICIENT);
+    // std::cout << "Xc - 1 = " << Xc << std::endl;
+    // Xc.SetFormat(EVALUATION);
+
+    // uint32_t indexNeg{NativeInteger(0).ModSubFast(c, M).ConvertToInt<uint32_t>()};
+    // const NativePoly& monomialNeg = params->GetMonomial(indexNeg == MInt ? 0 : indexNeg);
+
+    // NativePoly Xcneg = monomialNeg;
+    // std::cout << "Xcneg -1 = " << Xcneg << std::endl;
+    // Xcneg.SetFormat(COEFFICIENT);
+    // std::cout << "Xcneg - 1 = " << Xcneg << std::endl;
+    // Xcneg.SetFormat(EVALUATION);
 
     uint32_t digitsG{params->GetDigitsG() - 1};
     auto polyParams = params->GetPolyParams();
@@ -288,7 +334,7 @@ void UniEncAccumulatorXZW_B::AddToAccXZW(const std::shared_ptr<UniEncCryptoParam
 
     MKACCCiphertext acctemp = std::make_shared<MKACCCiphertextImpl>(*acc);
 
-   
+
     for (uint32_t u = 0; u < k; u++) {
         acctemp->GetElements()[u] = acctemp->GetElements()[u] * monomial;
     }
@@ -303,7 +349,7 @@ void UniEncAccumulatorXZW_B::AddToAccXZW(const std::shared_ptr<UniEncCryptoParam
 void UniEncAccumulatorXZW_B::AddToAccXZW0(const std::shared_ptr<UniEncCryptoParams>& params, ConstUniEncEvalKey& ekstar,
                                         ConstUniEncEvalKey& ek1, const NativeInteger& c,
                                         std::vector<std::vector<NativePoly>> Pkey, uint32_t index,
-                                        MKACCCiphertext& acc) const {
+                                        MKACCCiphertext& acc,std::vector<NativePoly> skf) const {
   //  std::cout << "In UniEncAccumulatorXZW_B AddToAccXZW0" << std::endl;
     uint32_t MInt{2 * params->GetN()};
     NativeInteger M{MInt};
@@ -311,22 +357,40 @@ void UniEncAccumulatorXZW_B::AddToAccXZW0(const std::shared_ptr<UniEncCryptoPara
   //  std::cout << "indexPos = " << indexPos << std::endl;
 
     const NativePoly& monomial = params->GetMonomial(indexPos == MInt ? 0 : indexPos);
-  
+    // NativePoly Xc              = monomial;
+    // std::cout << "Xc = " << Xc << std::endl;
+    // Xc.SetFormat(COEFFICIENT);
+    // std::cout << "Xc = " << Xc << std::endl;
+    // Xc.SetFormat(EVALUATION);
+
+    // uint32_t indexNeg{NativeInteger(0).ModSubFast(c, M).ConvertToInt<uint32_t>()};
+    // const NativePoly& monomialNeg = params->GetMonomial(indexNeg == MInt ? 0 : indexNeg);
     uint32_t digitsG{params->GetDigitsG() - 1};
     auto polyParams = params->GetPolyParams();
 
     const std::vector<std::vector<NativePoly>>& evs(ekstar->GetElements());
     const std::vector<std::vector<NativePoly>>& ev1(ek1->GetElements());
-
+   // const std::vector<std::vector<NativePoly>>& ev2(ek2->GetElements());
+    //std::cout<<"d,f"<<std::endl;
     std::vector<NativePoly> d(digitsG, NativePoly(polyParams));
     std::vector<NativePoly> f(digitsG, NativePoly(polyParams));
-
+    // NativePoly temp1(polyParams);
+    // NativePoly temp2(polyParams);
+    //std::cout<<"d,f"<<std::endl;
 
     for (uint32_t i = 0; i < digitsG; i++) {
         d[i] = evs[i][0] + ev1[i][0] * monomial ;
         f[i] = evs[i][1] + ev1[i][1] * monomial ;
     }
-  
+
+
+
+    // for (uint32_t i = 0; i < digitsG; i++) {
+    //     d[i].SetFormat(EVALUATION);
+    //     f[i].SetFormat(EVALUATION);
+    // }
+
+
     HbProd(params, d, f, index, Pkey, acc);
 }
 
