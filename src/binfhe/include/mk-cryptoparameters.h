@@ -85,7 +85,7 @@ private:
     // Error distribution generator
     DiscreteGaussianGeneratorImpl<NativeVector> m_dgg;
 
-
+    DiscreteGaussianGeneratorImpl<NativeVector> m_dggR;
     // A map of vectors of powers of baseG for sign evaluation
     std::map<uint32_t, std::vector<NativeInteger>> m_Gpower_map;
 
@@ -141,6 +141,7 @@ public:
         auto logQ{log(m_Q.ConvertToDouble())};
         m_digitsG = static_cast<uint32_t>(std::ceil(logQ / log(static_cast<double>(m_baseG))));//d=log B(Q)
         m_dgg.SetStd(0.25);//0.25 for 100 bit 0.4 for 128 bit prameters
+         m_dggR.SetStd(0.15);
         /*------------------------CRS-----------------------*/
         m_CRS = std::vector<NativePoly>(m_digitsG-1,NativePoly(m_dgg, m_polyParams, Format::COEFFICIENT));
         for(uint32_t i=0; i<m_digitsG-1 ;i++)
@@ -216,7 +217,9 @@ public:
     const DiscreteGaussianGeneratorImpl<NativeVector>& GetDgg() const {
         return m_dgg;
     }
-
+     const DiscreteGaussianGeneratorImpl<NativeVector>& GetDggR() const {
+        return m_dggR;
+    }
     const std::vector<NativeInteger>& GetGateConst() const {
         return m_gateConst;
     }

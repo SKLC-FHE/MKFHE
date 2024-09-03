@@ -141,15 +141,8 @@ UniEncEvalKey UniEncAccumulatorXZW_B::KeyGenXZW(const std::shared_ptr<UniEncCryp
     //std::cout<<"In KeyGenXZW:"<<std::endl;
     NativeInteger Q{params->GetQ()};
     uint32_t digitsG{(params->GetDigitsG() - 1)};
-   
-    TernaryUniformGeneratorImpl<NativeVector> tug;
     NativePoly skrPoly(polyParams);
-    usint hw = 2;
-    NativeVector r = tug.GenerateVector(N, Q,hw);
-    
-    skrPoly.SetValues(r, Format::COEFFICIENT);
-
-    skrPoly.SetFormat(Format::EVALUATION);
+    skrPoly=NativePoly(params->GetDggR(), polyParams, Format::EVALUATION);
     
 
     UniEncEvalKeyImpl result(digitsG, 2);  //  (d,f) R^d x R^d
@@ -194,18 +187,9 @@ UniEncEvalKey UniEncAccumulatorXZW_B::KDMKeyGenXZW(const std::shared_ptr<UniEncC
     auto N                 = params->GetN();
     NativeInteger Q{params->GetQ()};
     uint32_t digitsG{(params->GetDigitsG() - 1)};
-
-    TernaryUniformGeneratorImpl<NativeVector> tug;
     NativePoly skrPoly(polyParams);
-    usint hw=2;
-    NativeVector r = tug.GenerateVector(N, Q,hw);
-    skrPoly.SetValues(r, Format::COEFFICIENT);
-   
-    skrPoly.SetFormat(Format::EVALUATION);
-    
-
+    skrPoly=NativePoly(params->GetDggR(), polyParams, Format::EVALUATION);
     UniEncEvalKeyImpl result(digitsG, 2);  //  (d,f) R^d x R^d
-
     //UniEncEvalKeyImpl result;
     for (uint32_t i = 0; i < digitsG; ++i) {
  

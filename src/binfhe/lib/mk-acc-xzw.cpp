@@ -138,21 +138,11 @@ UniEncEvalKey UniEncAccumulatorXZW::KeyGenXZW(const std::shared_ptr<UniEncCrypto
 
     NativeInteger Q{params->GetQ()};
     uint32_t digitsG{(params->GetDigitsG() - 1)};
-  
-    TernaryUniformGeneratorImpl<NativeVector> tug;
     NativePoly skrPoly(polyParams);
-    usint hw = 2;
-    NativeVector r = tug.GenerateVector(N, Q,hw);
-    // NativeVector r = tug.GenerateVector(N, Q);
-    skrPoly.SetValues(r, Format::COEFFICIENT);
-  //  cout << "skr" << r << endl;
-    skrPoly.SetFormat(Format::EVALUATION);
-   
+    skrPoly=NativePoly(params->GetDggR(), polyParams, Format::EVALUATION);
 
     UniEncEvalKeyImpl result(digitsG, 2);  //  (d,f) R^d x R^d
 
-    //std::cout<<"11"<<std::endl;
-    //UniEncEvalKeyImpl result;
     for (uint32_t i = 0; i < digitsG; ++i) {
        
         result[i][0] = NativePoly(params->GetDgg(), polyParams, Format::COEFFICIENT);
@@ -206,14 +196,8 @@ UniEncEvalKey UniEncAccumulatorXZW::KDMKeyGenXZW(const std::shared_ptr<UniEncCry
     auto N                 = params->GetN();
     NativeInteger Q{params->GetQ()};
     uint32_t digitsG{(params->GetDigitsG() - 1)};
- 
-    TernaryUniformGeneratorImpl<NativeVector> tug;
     NativePoly skrPoly(polyParams);
-    usint hw=2;
-    NativeVector r = tug.GenerateVector(N, Q,hw);
-    skrPoly.SetValues(r, Format::COEFFICIENT);
-   // cout << "KDMskr" << r << endl;
-    skrPoly.SetFormat(Format::EVALUATION);
+    skrPoly=NativePoly(params->GetDggR(), polyParams, Format::EVALUATION);
 
     UniEncEvalKeyImpl result(digitsG, 2);  //  (d,f) R^d x R^d
 

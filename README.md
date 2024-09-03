@@ -1,5 +1,5 @@
 # MK-FHE
- 
+
 A proof of concept for NTRU based MKFHE
 =====================================
 
@@ -9,7 +9,7 @@ OpenFHE v1.1.1,
 
 a C++ compiler, the NTL, GMP libraries.
 
-## Run the code
+## Run the code 
 
 1. Configure, build and compile the project.
 
