@@ -142,6 +142,13 @@ public:
         m_digitsG = static_cast<uint32_t>(std::ceil(logQ / log(static_cast<double>(m_baseG))));//d=log B(Q)
         m_dgg.SetStd(0.25);//0.25 for 100 bit 0.4 for 128 bit prameters
          m_dggR.SetStd(0.15);
+           // /**
+          //  Evaluating the security strength of this parameter using the LWE estimater
+           //    params = LWE.Parameters(n=2048, q=2**27, Xs=ND.DiscreteGaussian(0.15), Xe=ND.DiscreteGaussian(0.25)) 
+          //usvp                 :: rop: ≈2^213.5, red: ≈2^213.5, δ: 1.002823, β: 648, d: 3552, tag: usvp
+         // bdd                  :: rop: ≈2^211.6, red: ≈2^211.3, svp: ≈2^209.3, β: 640, η: 674, d: 3555, tag: bdd
+//
+             */
         /*------------------------CRS-----------------------*/
         m_CRS = std::vector<NativePoly>(m_digitsG-1,NativePoly(m_dgg, m_polyParams, Format::COEFFICIENT));
         for(uint32_t i=0; i<m_digitsG-1 ;i++)
