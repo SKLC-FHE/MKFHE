@@ -20,5 +20,5 @@ cmake -DWITH_NTL=ON  -DNATIVE_SIZE=32 -DWITH_NATIVEOPT=ON -DCMAKE_C_COMPILER=cla
 make 
 ```
 
-2. Run the `boolean-ntru` or `boolean-lwe` program in `build/bin/examples/binfhe`
+2. Run the `boolean-mkntru` or `boolean-mklwe` program in `build/bin/examples/binfhe`
 
