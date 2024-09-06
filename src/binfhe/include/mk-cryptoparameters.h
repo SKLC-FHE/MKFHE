@@ -141,12 +141,35 @@ public:
         auto logQ{log(m_Q.ConvertToDouble())};
         m_digitsG = static_cast<uint32_t>(std::ceil(logQ / log(static_cast<double>(m_baseG))));//d=log B(Q)
         m_dgg.SetStd(0.25);//0.25 for 100 bit 0.4 for 128 bit prameters
-         m_dggR.SetStd(0.15);
-           // /**
-          //  Evaluating the security strength of this parameter using the LWE estimater
-           //    params = LWE.Parameters(n=2048, q=2**27, Xs=ND.DiscreteGaussian(0.15), Xe=ND.DiscreteGaussian(0.25)) 
-          //usvp                 :: rop: ≈2^213.5, red: ≈2^213.5, δ: 1.002823, β: 648, d: 3552, tag: usvp
-         // bdd                  :: rop: ≈2^211.6, red: ≈2^211.3, svp: ≈2^209.3, β: 640, η: 674, d: 3555, tag: bdd
+         m_dggR.SetStd(0.15);//0.15 for 100 bit 0.16 for 128 bit prameters
+         // Evaluating the security strength of this parameter using the LWE estimator
+//    params = LWE.Parameters(n=2048, q=2**27, Xs=ND.DiscreteGaussian(0.15), Xe=ND.DiscreteGaussian(0.25)) 
+//    LWEParameters(n=2048, q=134217728, Xs=D(σ=0.15), Xe=D(σ=0.40), m=+Infinity, tag=None)
+// usvp                 :: rop: ≈2^213.5, red: ≈2^213.5, δ: 1.002823, β: 648, d: 3552, tag: usvp
+// bdd                  :: rop: ≈2^211.6, red: ≈2^211.3, svp: ≈2^209.3, β: 640, η: 674, d: 3555, tag: bdd
+// But using the estimator, only two types of attacks appear, usvp and bdd, without dual and hybrid attacks. This seems to be due to the estimator, as when the secret key distribution is too small, it is only suitable for using a sparse ternary distribution.
+// So we choose a set of sparse ternary distributions to simulate our discrete Gaussian distribution with sigma=0.15
+// params = LWE.Parameters(n=2048, q=2**27, Xs= ND.SparseTernary(2048, 22), Xe=ND.DiscreteGaussian(0.25))
+// also: LWEParameters(n=2048, q=134217728, Xs=D(σ=0.15), Xe=D(σ=0.40), m=+Infinity, tag=None)
+// usvp                 :: rop: ≈2^213.2, red: ≈2^213.2, δ: 1.002826, β: 647, d: 3543, tag: usvp
+// bdd                  :: rop: ≈2^211.3, red: ≈2^211.0, svp: ≈2^209.0, β: 639, η: 673, d: 3545, tag: bdd
+// bdd_hybrid           :: rop: ≈2^133.0, red: ≈2^132.7, svp: ≈2^130.6, β: 308, η: 26, ζ: 1023, |S|: ≈2^88.1, d: 1820, prob: ≈2^-12.5, ↻: ≈2^14.7, tag: hybrid
+// bdd_mitm_hybrid      :: rop: ≈2^115.4, red: ≈2^114.5, svp: ≈2^114.4, β: 209, η: 2, ζ: 1426, |S|: ≈2^139.3, d: 1083, prob: ≈2^-22.4, ↻: ≈2^24.6, tag: hybrid
+// dual                 :: rop: ≈2^218.0, mem: ≈2^135.0, m: 1611, β: 660, d: 3659, ↻: 1, tag: dual
+// dual_hybrid          :: rop: ≈2^122.2, mem: ≈2^82.4, m: 702, β: 182, d: 1426, ↻: ≈2^37.6, ζ: 1324, h1: 7, tag: dual_hybrid
+// dual_mitm_hybrid     :: rop: ≈2^116.6, mem: ≈2^83.6, m: 712, k: 853, ↻: ≈2^32.6, β: 196, d: 1203, ζ: 1557, h1: 16, tag: dual_mitm_hybrid
+// The security level is sufficient for 100-bit security.
+// For 128-bit parameters
+// params = LWE.Parameters(n=2048, q=2**27, Xs= ND.SparseTernary(2048, 30), Xe=ND.DiscreteGaussian(0.4))
+// LWEParameters(n=2048, q=134217728, Xs=D(σ=0.17), Xe=D(σ=0.40), m=+Infinity, tag=None)
+// usvp                 :: rop: ≈2^219.9, red: ≈2^219.9, δ: 1.002752, β: 671, d: 3602, tag: usvp
+// bdd                  :: rop: ≈2^218.0, red: ≈2^217.7, svp: ≈2^215.7, β: 663, η: 697, d: 3585, tag: bdd
+// bdd_hybrid           :: rop: ≈2^149.2, red: ≈2^148.3, svp: ≈2^148.1, β: 336, η: 2, ζ: 1024, |S|: ≈2^103.1, d: 1903, prob: ≈2^-20.3, ↻: ≈2^22.5, tag: hybrid
+// bdd_mitm_hybrid      :: rop: ≈2^134.1, red: ≈2^133.3, svp: ≈2^133.0, β: 260, η: 2, ζ: 1334, |S|: ≈2^166.4, d: 1355, prob: ≈2^-26.8, ↻: ≈2^29.0, tag: hybrid
+// dual                 :: rop: ≈2^225.2, mem: ≈2^138.0, m: 1631, β: 686, d: 3679, ↻: 1, tag: dual
+// dual_hybrid          :: rop: ≈2^142.5, mem: ≈2^101.7, m: 843, β: 253, d: 1730, ↻: ≈2^38.3, ζ: 1161, h1: 9, tag: dual_hybrid
+// dual_mitm_hybrid     :: rop: ≈2^140.0, mem: ≈2^103.6, m: 850, k: 809, ↻: ≈2^36.0, β: 269, d: 1429, ζ: 1469, h1: 21, tag: dual_mitm_hybrid
+
         /*------------------------CRS-----------------------*/
         m_CRS = std::vector<NativePoly>(m_digitsG-1,NativePoly(m_dgg, m_polyParams, Format::COEFFICIENT));
         for(uint32_t i=0; i<m_digitsG-1 ;i++)
