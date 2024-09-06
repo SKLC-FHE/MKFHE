@@ -141,7 +141,7 @@ public:
         auto logQ{log(m_Q.ConvertToDouble())};
         m_digitsG = static_cast<uint32_t>(std::ceil(logQ / log(static_cast<double>(m_baseG))));//d=log B(Q)
         m_dgg.SetStd(0.25);//0.25 for 100 bit 0.4 for 128 bit prameters
-         m_dggR.SetStd(0.15);//0.15 for 100 bit 0.16 for 128 bit prameters
+         m_dggR.SetStd(0.15);//0.15 for 100 bit 0.17 for 128 bit prameters
          // Evaluating the security strength of this parameter using the LWE estimator
 //    params = LWE.Parameters(n=2048, q=2**27, Xs=ND.DiscreteGaussian(0.15), Xe=ND.DiscreteGaussian(0.25)) 
 //    LWEParameters(n=2048, q=134217728, Xs=D(σ=0.15), Xe=D(σ=0.40), m=+Infinity, tag=None)
