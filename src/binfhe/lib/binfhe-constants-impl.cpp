@@ -94,6 +94,15 @@ std::ostream& operator<<(std::ostream& s, BINFHE_PARAMSET f) {
         case STD128_LMKCDEY_New:
             s << "STD128_LMKCDEY_New";
             break;
+        case STD100_MKNTRU_LWE:
+            s << "STD100_MKNTRU_LWE";
+            break;
+        case STD100_MKNTRU:
+            s << "STD100_MKNTRU";
+            break;
+        case STD128_MKNTRU:
+            s << "STD128_MKNTRU";
+            break;
         default:
             s << "UNKNOWN";
             break;
@@ -126,6 +135,12 @@ std::ostream& operator<<(std::ostream& s, BINFHE_METHOD f) {
             break;
         case LMKCDEY:
             s << "LMKCDEY";
+            break;
+        case MKNTRU_LWE:
+            s << "MKNTRU_LWE";
+            break;
+        case MKNTRU:
+            s << "MKNTRU";
             break;
         default:
             s << "UNKNOWN";
